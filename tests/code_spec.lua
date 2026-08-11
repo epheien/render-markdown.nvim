@@ -154,7 +154,7 @@ describe('code', function()
         marks:add(row:get(0), 2, util.code.hide(w2))
         marks:add(row:get(1), 0, {
             priority = 100,
-            virt_text = { { '  ', 'Normal' }, { '  ', 'RmCode' } },
+            virt_text = { { '  ', 'RmPadding' }, { '  ', 'RmCode' } },
             virt_text_pos = 'inline',
         })
         marks:add(row:get(0), 0, util.code.hide(w2))

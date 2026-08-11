@@ -25,10 +25,7 @@ function M.setup.init(opts)
         win_options = { concealcursor = { rendered = 'nvic' } },
         overrides = {
             buftype = {
-                nofile = {
-                    padding = { highlight = 'Normal' },
-                    sign = { enabled = true },
-                },
+                nofile = { sign = { enabled = true } },
             },
         },
     }
@@ -111,10 +108,11 @@ function M.checkbox(kind, space)
         line[#line + 1] = { '󰥔 ', 'RmTodo' }
     end
     if space > 0 then
-        line[#line + 1] = { (' '):rep(space), 'Normal' }
+        line[#line + 1] = { (' '):rep(space), 'RmPadding' }
     end
     ---@type vim.api.keyset.set_extmark
     return {
+        hl_mode = 'combine',
         virt_text = line,
         virt_text_pos = 'overlay',
     }
@@ -177,14 +175,15 @@ function M.quote(highlight)
 end
 
 ---@param spaces integer
----@param priority? integer|false
----@param highlight? string
+---@param opts? { priority?: integer|false, highlight?: string, combine?: boolean }
 ---@return vim.api.keyset.set_extmark
-function M.padding(spaces, priority, highlight)
+function M.padding(spaces, opts)
+    opts = opts or {}
     ---@type vim.api.keyset.set_extmark
     return {
-        priority = priority or (priority ~= false and 100 or nil),
-        virt_text = { { (' '):rep(spaces), highlight or 'Normal' } },
+        priority = opts.priority or (opts.priority ~= false and 100 or nil),
+        hl_mode = opts.combine and 'combine' or nil,
+        virt_text = { { (' '):rep(spaces), opts.highlight or 'RmPadding' } },
         virt_text_pos = 'inline',
     }
 end
@@ -222,7 +221,7 @@ function M.indent.line(lengths)
         if length == 1 then
             result[#result + 1] = { '▎', 'RmIndent' }
         else
-            result[#result + 1] = { (' '):rep(length), 'Normal' }
+            result[#result + 1] = { (' '):rep(length), 'RmPadding' }
         end
     end
     return result
@@ -353,7 +352,7 @@ function M.code.hide(width)
     ---@type vim.api.keyset.set_extmark
     return {
         priority = 0,
-        virt_text = { { (' '):rep(vim.o.columns * 2), 'Normal' } },
+        virt_text = { { (' '):rep(vim.o.columns * 2), 'RmPadding' } },
         ---@diagnostic disable-next-line: assign-type-mismatch
         virt_text_pos = 'win_col',
         virt_text_win_col = width,
@@ -364,9 +363,10 @@ end
 ---@param spaces integer
 ---@return vim.api.keyset.set_extmark
 function M.code.padding(kind, spaces)
-    local priority = kind == 'inline' and 0 or nil
-    local highlight = kind == 'inline' and 'RmCodeInline' or 'RmCode'
-    return M.padding(spaces, priority, highlight)
+    return M.padding(spaces, {
+        priority = kind == 'inline' and 0 or nil,
+        highlight = kind == 'inline' and 'RmCodeInline' or 'RmCode',
+    })
 end
 
 ---@class render.md.test.Table
@@ -426,7 +426,7 @@ function M.table.delimiter(padding, ...)
         :join('┼')
     local line = { { '├' .. inner .. '┤', 'RmTableHead' } }
     if padding > 0 then
-        line[#line + 1] = { (' '):rep(padding), 'Normal' }
+        line[#line + 1] = { (' '):rep(padding), 'RmPadding' }
     end
     ---@type vim.api.keyset.set_extmark
     return {
@@ -438,7 +438,7 @@ end
 ---@param spaces integer
 ---@return vim.api.keyset.set_extmark
 function M.table.padding(spaces)
-    return M.padding(spaces, 0)
+    return M.padding(spaces, { priority = 0 })
 end
 
 ---@param marks render.md.test.Marks

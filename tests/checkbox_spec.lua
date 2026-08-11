@@ -16,7 +16,7 @@ describe('checkbox', function()
         marks:add({ 1, 1 }, { 0, 4 }, util.ordered(2))
         marks:add({ 1, 1 }, { 4, 7 }, util.conceal())
         marks:add(1, 7, util.checkbox('todo', 0))
-        marks:add(1, 11, util.padding(1, false))
+        marks:add(1, 11, util.padding(1, { priority = false, combine = true }))
         util.assert_view(marks, {
             '1.  󰱒   Checked Checkbox',
             '2.  󰥔   Todo Checkbox',
