@@ -39,6 +39,25 @@ function Conceal:enabled()
     return self.level > 0
 end
 
+---@return boolean
+function Conceal:fully()
+    return self.level == 3
+end
+
+---@param row integer
+---@param start_col integer
+---@param end_col integer
+---@return boolean
+function Conceal:contains(row, start_col, end_col)
+    local body = { start_row = row } ---@type render.md.node.Body
+    for _, range in ipairs(self:line(body).ranges) do
+        if start_col < range[2] and end_col > range[1] then
+            return true
+        end
+    end
+    return false
+end
+
 ---@param row integer
 ---@param entry boolean|render.md.request.conceal.Range
 function Conceal:add(row, entry)

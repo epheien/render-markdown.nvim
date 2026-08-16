@@ -8,6 +8,7 @@ local str = require('render-markdown.lib.str')
 ---@field conceal render.md.request.Conceal
 ---@field callout render.md.request.Callout
 ---@field checkbox render.md.request.Checkbox
+---@field highlight render.md.request.Highlight
 ---@field inline render.md.request.Inline
 ---@field latex render.md.request.Latex
 ---@field used render.md.request.Used
@@ -29,6 +30,7 @@ function Context.new(buf, win, config, view)
         require('render-markdown.request.conceal').new(buf, win, view)
     self.callout = require('render-markdown.request.callout').new()
     self.checkbox = require('render-markdown.request.checkbox').new()
+    self.highlight = require('render-markdown.request.highlight').new(buf)
     self.inline = require('render-markdown.request.inline').new()
     self.latex = require('render-markdown.request.latex').new()
     self.used = require('render-markdown.request.used').new()

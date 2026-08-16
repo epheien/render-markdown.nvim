@@ -7,6 +7,7 @@ local log = require('render-markdown.core.log')
 ---@field start_row integer
 ---@field start_col integer
 ---@field opts render.md.mark.Opts
+---@field range? render.md.Range
 
 ---@alias render.md.mark.Conceal boolean|render.md.Element
 
@@ -77,8 +78,9 @@ end
 ---@param start_row integer
 ---@param start_col integer
 ---@param opts render.md.mark.Opts
+---@param range? render.md.Range
 ---@return boolean
-function Marks:add(config, conceal, start_row, start_col, opts)
+function Marks:add(config, conceal, start_row, start_col, opts, range)
     ---@type render.md.Mark
     local mark = {
         modes = config.render_modes,
@@ -86,6 +88,7 @@ function Marks:add(config, conceal, start_row, start_col, opts)
         start_row = start_row,
         start_col = start_col,
         opts = opts,
+        range = range,
     }
     local feature, min_version = self:validate(mark.opts)
     if feature and min_version then
@@ -132,10 +135,19 @@ function Marks:run_update(mark)
         local end_col = assert(opts.end_col, 'conceal requires end_col')
         self.context.conceal:add(row, { start_col, end_col, opts.conceal, 1 })
     end
-    if opts.virt_text_pos == 'inline' then
+    if opts.hl_group then
+        self.context.highlight:add(row, {
+            start_col = start_col,
+            end_col = opts.end_col or start_col,
+            highlight = opts.hl_group,
+        })
+    end
+    if vim.tbl_contains({ 'inline', 'overlay' }, opts.virt_text_pos) then
         self.context.inline:add(row, {
             col = start_col,
+            end_col = opts.end_col or start_col,
             line = opts.virt_text or {},
+            replacement = opts.virt_text_pos == 'overlay',
         })
     end
 end

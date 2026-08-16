@@ -38,6 +38,17 @@ function M.init()
             end
         end,
     })
+    vim.api.nvim_create_autocmd('OptionSet', {
+        group = M.group,
+        pattern = 'wrap',
+        callback = function(args)
+            local win = env.win.current()
+            local buf = env.win.buf(win)
+            if M.attached(buf) and state.get(buf).enabled then
+                ui.update(buf, win, args.event, true)
+            end
+        end,
+    })
 end
 
 ---@param buf integer

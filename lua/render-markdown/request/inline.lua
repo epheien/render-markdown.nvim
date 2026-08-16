@@ -2,7 +2,9 @@ local str = require('render-markdown.lib.str')
 
 ---@class render.md.request.inline.Value
 ---@field col integer
+---@field end_col integer
 ---@field line render.md.mark.Line
+---@field replacement boolean
 
 ---@class render.md.request.Inline
 ---@field private values table<integer, render.md.request.inline.Value[]>
@@ -45,10 +47,16 @@ function Inline:get(body)
     local result = {} ---@type render.md.request.inline.Value[]
     local values = self.values[body.start_row] or {}
     for _, value in ipairs(values) do
-        if body.start_col <= value.col and body.end_col > value.col then
+        if body.start_col <= value.end_col and body.end_col >= value.col then
             result[#result + 1] = value
         end
     end
+    table.sort(result, function(a, b)
+        if a.col == b.col then
+            return a.replacement and not b.replacement
+        end
+        return a.col < b.col
+    end)
     return result
 end
 

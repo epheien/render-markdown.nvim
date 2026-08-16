@@ -19,7 +19,7 @@ function Extmark.new(mark)
     if mark.opts.hl_eol then
         bottom = bottom - 1
     end
-    self.range = { top, bottom }
+    self.range = mark.range or { top, bottom }
     return self
 end
 

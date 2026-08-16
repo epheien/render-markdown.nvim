@@ -220,8 +220,14 @@ function Updater:hide(extmark, range)
         return true
     end
 
+    local overlap = extmark:overlaps(range)
+    if not overlap and not range and mark.range then
+        local row = env.row.get(self.buf, self.win)
+        overlap = row ~= nil and extmark:overlaps({ row, row })
+    end
+
     -- does not overlap with hidden range -> show
-    if not extmark:overlaps(range) then
+    if not overlap then
         return false
     end
 
